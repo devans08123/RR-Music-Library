@@ -1,41 +1,40 @@
-import './App.css';
 import { useEffect, useState } from 'react'
-import Gallery from './components/Gallery'
-import SearchBar from './components/SearchBar'
+import Gallery from './Components/Gallery'
+import SearchBar from './Components/SearchBar'
 
-function App() {
-  let [searchTerm, setSearchTerm] = useState('')
-  let [data, setData] = useState([])
-  let [message, setMessage] = useState('Search for Music!')
+function App(){
+    const [search, setSearch] = useState('')
+    const [message, setMessage] = useState('Search for Music!')
+    const [data, setData] = useState([])
 
-  useEffect(() => {
-    if (searchTerm) {
-      document.title=`${searchTerm} Music`
-      const fetchData = async () => {
-        const response = await fetch(`https://itunes.apple.com/search?term=${searchTerm}`)
-        const resData = await response.json()
-        if(resData.results.length > 0) {
-          setData(resData.results)
-        } else {
-          setMessage('Not Found')
+    useEffect(() => {
+        const fetchData = async () => {
+            const API_URL = `https://itunes.apple.com/search?term=${encodeURI(search)}`
+          const response = await fetch(API_URL)
+          const data = await response.json()
+          console.log(data)
+          if(data.results.length > 0) {
+            setData(data.results)
+          }else {
+            setMessage('Not Found')
+          }
         }
+  
+        if (search)fetchData()
+      },[search])
+
+      const handleSearch = (e, term) => {
+        e.preventDefault()
+        setSearch(term)
       }
-      fetchData()
-  }
-  }, [searchTerm])
-
-  const handleSearch = (e, term) => {
-    e.preventDefault()
-    setSearchTerm(term)
-  }
-
-  return (
-    <div className="App">
-      <SearchBar handleSearch={handleSearch} />
-      {message}
-      <Gallery data={data} />
-    </div>
-  );
+    
+    return (
+        <div>
+            <SearchBar handleSearch={handleSearch}/>
+            {message}
+            <Gallery data={data}/>
+        </div>
+    )
 }
 
-export default App;
+export default App
